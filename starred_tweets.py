@@ -20,6 +20,13 @@ def main():
         username = tweet.find('span', { 'class': 'username' }).text
         content = tweet.find('div', { 'class': 'dir-ltr' })
         tweet_id = tweet.find('td', { 'class': 'timestamp' }).find('a')['name']
+        date = tweet.find('td', { 'class': 'timestamp' }).find('a').text
+
+        try:
+            date = datetime.datetime.strptime(date, "%d %b %y")
+        except ValueError:
+            date = datetime.datetime.strptime(date, "%d %b")
+            date = date.replace(year = datetime.datetime.now().year)
 
         links = content.findAll('a')
         first_link = None
@@ -41,7 +48,7 @@ def main():
             title = content.text,
             link = first_link,
             description = description,
-            pubDate = datetime.datetime.now(),
+            pubDate = date,
             guid = PyRSS2Gen.Guid(tweet_id, isPermaLink = 0)
             ))
 
