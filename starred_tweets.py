@@ -3,6 +3,7 @@
 import datetime
 import PyRSS2Gen
 import requests
+import xmlpp
 from BeautifulSoup import BeautifulSoup
 
 def main():
@@ -41,19 +42,19 @@ def main():
             link = first_link,
             description = description,
             pubDate = datetime.datetime.now(),
-            guid = tweet_id
+            guid = PyRSS2Gen.Guid(tweet_id, isPermaLink = 0)
             ))
 
 
     rss = PyRSS2Gen.RSS2(
             title = 'Starred Tweets',
-            link = '',
+            link = 'http://home.kuijjer.com/starred_tweets.rss',
             description = 'Starred Tweets',
             lastBuildDate = datetime.datetime.now(),
             items = rss_items,
             )
 
-    print rss.to_xml()
+    print xmlpp.get_pprint(rss.to_xml())
 
 if __name__ == "__main__":
     main()
