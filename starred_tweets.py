@@ -20,14 +20,7 @@ def main():
         username = tweet.find('span', { 'class': 'username' }).text
         content = tweet.find('div', { 'class': 'dir-ltr' })
         tweet_id = tweet.find('td', { 'class': 'timestamp' }).find('a')['name']
-        date = tweet.find('td', { 'class': 'timestamp' }).find('a').text
-
-        try:
-            date = datetime.datetime.strptime(date, "%d %b %y")
-        except ValueError:
-            date = datetime.datetime.strptime(date, "%d %b")
-            date = date.replace(year = datetime.datetime.now().year)
-
+        date = parse_date(tweet.find('td', { 'class': 'timestamp' }).find('a').text)
         links = content.findAll('a')
         first_link = None
         for link in links:
@@ -62,6 +55,27 @@ def main():
             )
 
     print xmlpp.get_pprint(rss.to_xml())
+
+def parse_date(date):
+    now = datetime.datetime.now()
+
+    if date.endswith('m'):
+        m = int(str(date)[:-1])
+        return now - datetime.timedelta(minutes = m)
+
+    elif date.endswith('h'):
+        h = int(str(date)[:-1])
+        return now - datetime.timedelta(hours = h)
+
+    else:
+        try:
+            return datetime.datetime.strptime(date, "%d %b %y")
+        except ValueError:
+            try:
+                return datetime.datetime.strptime(date, "%d %b").replace(year = datetime.datetime.now().year)
+            except ValueError:
+                return now
+
 
 if __name__ == "__main__":
     main()
