@@ -1,2 +1,2 @@
 #!/bin/bash
-~/src/starred_tweets/starred_tweets.py > ~/www/starred_tweets.rss
+~/src/starred_tweets/starred_tweets.py | ~/src/dropbox_upload.py '/public/starred_tweets.rss'

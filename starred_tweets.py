@@ -4,16 +4,29 @@ import datetime
 import PyRSS2Gen
 import requests
 import xmlpp
+import sys
+import re
 from BeautifulSoup import BeautifulSoup
 
-def main():
+def retrieve_url():
     url = 'http://mobile.twitter.com/ckuijjer/favorites'
     response = requests.get(url)
+    return response.content
 
-    soup = BeautifulSoup(response.content)
+def retrieve_file(filename):
+    f = open(filename, 'r')
+    return f.read()
+
+def main():
+    if len(sys.argv) > 1:
+        content = retrieve_file(sys.argv[1])
+    else:
+        content = retrieve_url()
+
+    soup = BeautifulSoup(content)
 
     rss_items = []
-    tweets = soup.findAll('table', { 'class': 'tweet' })
+    tweets = soup.findAll('table', { 'class': re.compile(r'\btweet\b') })
 
     for tweet in tweets:
         author = tweet.find('strong', { 'class': 'fullname' }).text
@@ -48,7 +61,7 @@ def main():
 
     rss = PyRSS2Gen.RSS2(
             title = 'Starred Tweets',
-            link = 'http://home.kuijjer.com/starred_tweets.rss',
+            link = 'http://dropbox.kuijjer.com/starred_tweets.rss',
             description = 'Starred Tweets',
             lastBuildDate = datetime.datetime.now(),
             items = rss_items,
